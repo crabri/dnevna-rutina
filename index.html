@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="hr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#7a1212">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dnevna rutina">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<title>Dnevna rutina</title>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #f7f5f0;
+  --bg2:     #ffffff;
+  --bg3:     #eeebe4;
+  --border:  rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.15);
+  --gold:    #9a6f2e;
+  --gold-bg: rgba(154,111,46,0.08);
+  --gold-br: rgba(154,111,46,0.2);
+  --text:    #1a1a1a;
+  --text2:   #555;
+  --muted:   #888;
+  --acc:     #8B1A1A;
+  --acc2:    #6b1212;
+  --acc-bg:  rgba(139,26,26,0.07);
+  --acc-br:  rgba(139,26,26,0.22);
+  --cal0:    #e8e4dc;
+  --cal1:    #e8c4c4;
+  --cal2:    #cc7777;
+  --cal3:    #a83232;
+  --cal4:    #6b1212;
+  --radius:  14px;
+  --rsm:     8px;
+  --shadow:  0 1px 4px rgba(0,0,0,0.07);
+  --lit-color: #7a7a7a;
+}
+[data-theme="dark"] {
+  --bg:      #0f0e18;
+  --bg2:     #2a2740;
+  --bg3:     #332f4a;
+  --border:  rgba(255,255,255,0.11);
+  --border2: rgba(255,255,255,0.20);
+  --gold:    #d4b05a;
+  --gold-bg: rgba(212,176,90,0.12);
+  --gold-br: rgba(212,176,90,0.28);
+  --text:    #f0ecff;
+  --text2:   #c0bcd8;
+  --muted:   #8a87a8;
+  --acc:     #d4625a;
+  --acc2:    #b84840;
+  --acc-bg:  rgba(200,80,70,0.15);
+  --acc-br:  rgba(200,80,70,0.35);
+  --cal0:    #2e2b42;
+  --cal1:    #5a2020;
+  --cal2:    #8a3030;
+  --cal3:    #b84040;
+  --cal4:    #d86060;
+  --shadow:  0 1px 6px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .25s,color .25s}
+
+/* liturgical bar at top */
+.lit-bar{height:3px;width:100%;background:var(--lit-color);transition:background .5s;position:fixed;top:0;left:0;z-index:200}
+
+.wrap{max-width:600px;margin:0 auto;width:100%;padding-top:3px}
+
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+#page-home{display:none;flex-direction:column;min-height:100vh}
+#page-home.active{display:flex;align-items:center}
+#page-home.active>*{width:100%}
+
+/* theme toggle */
+.theme-toggle{position:fixed;top:14px;right:16px;z-index:100;width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--bg2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);transition:all .2s}
+.theme-toggle:hover{border-color:var(--gold)}
+
+/* ── HOME ── */
+.home-hero{padding:3rem 1.5rem 1.25rem;text-align:center}
+.home-hero::before{content:'✦';display:block;font-size:26px;color:var(--gold);margin-bottom:1rem;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+.home-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--text);line-height:1.1;margin-bottom:.3rem}
+.home-sub{font-size:.78rem;color:var(--muted);letter-spacing:.13em;text-transform:uppercase}
+.home-date{margin-top:1rem;font-size:.78rem;color:var(--gold);letter-spacing:.06em}
+.home-saint{margin-top:.4rem;font-size:.74rem;color:var(--muted);font-style:italic;min-height:1rem}
+.home-lit{margin-top:.3rem;font-size:.72rem;color:var(--lit-text-color,var(--muted));letter-spacing:.08em;text-transform:uppercase;font-weight:700;min-height:.9rem;transition:color .5s}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;padding:1.1rem 1.25rem .4rem}
+.home-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1rem;cursor:pointer;text-align:left;transition:all .18s;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.home-btn:hover{border-color:var(--gold-br);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.home-btn:active{transform:translateY(0)}
+.home-btn-icon{font-size:1.5rem;margin-bottom:.55rem;display:block}
+.home-btn-title{font-family:'Cormorant Garamond',serif;font-size:1.12rem;font-weight:600;color:var(--text);margin-bottom:.2rem}
+.home-btn-sub{font-size:.68rem;color:var(--muted);line-height:1.4}
+.home-btn-streak{position:absolute;top:9px;right:9px;font-size:.6rem;color:var(--acc);background:var(--acc-bg);padding:2px 7px;border-radius:99px;border:1px solid var(--acc-br)}
+.home-quote{padding:.8rem 1.5rem 1.8rem;text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.9rem;color:var(--muted);line-height:1.6}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:center;gap:1rem;padding:.85rem 1.25rem;border-bottom:1px solid var(--border);position:sticky;top:3px;background:var(--bg);z-index:10}
+.back-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;box-shadow:var(--shadow)}
+.back-btn:hover{border-color:var(--gold);color:var(--gold)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--text);flex:1}
+.page-day{font-size:.68rem;color:var(--muted);text-align:right;line-height:1.4}
+.page-saint{font-size:.64rem;color:var(--muted);font-style:italic}
+
+/* ── PROGRESS ── */
+.progress-wrap{padding:.7rem 1.25rem .35rem}
+.progress-row{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:5px}
+.progress-track{height:3px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));border-radius:99px;transition:width .4s ease}
+
+/* ── SECTIONS ── */
+.section-block{padding:.9rem 1.25rem .4rem}
+.section-label{font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:.55rem;font-weight:500}
+
+/* ── CHECK ITEMS ── */
+.check-item{display:flex;align-items:flex-start;gap:11px;padding:10px 11px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg2);margin-bottom:4px;cursor:pointer;transition:all .15s;user-select:none;box-shadow:var(--shadow)}
+.check-item:hover{border-color:var(--border2)}
+.check-item.done{opacity:.5}
+.check-item.done .ci-name{text-decoration:line-through;color:var(--muted)}
+.ci-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.check-item.done .ci-check{background:var(--acc);border-color:var(--acc)}
+.ci-check-inner{width:8px;height:8px;border-right:2px solid white;border-bottom:2px solid white;transform:rotate(45deg) translate(-1px,-1px);opacity:0;transition:opacity .15s}
+.check-item.done .ci-check-inner{opacity:1}
+.ci-body{flex:1}
+.ci-name{font-size:.85rem;font-weight:500;color:var(--text);line-height:1.35}
+.ci-desc{font-size:.71rem;color:var(--muted);margin-top:2px;line-height:1.4}
+.ci-streak{font-size:.66rem;color:var(--acc);flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.ci-streak-num{font-size:.92rem;font-weight:500;line-height:1}
+.ci-streak-label{font-size:.56rem;color:var(--muted)}
+
+/* expandable note under item */
+.ci-expand{display:none;padding:6px 0 2px 31px}
+.ci-expand.open{display:block}
+.ci-expand-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:7px 10px;resize:none;height:60px;outline:none;transition:border-color .15s;line-height:1.45}
+.ci-expand-ta::placeholder{color:var(--muted)}
+.ci-expand-ta:focus{border-color:var(--gold-br)}
+.ci-expand-label{font-size:.62rem;color:var(--muted);margin-bottom:3px}
+.expand-btn{font-size:.65rem;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;margin-top:3px;transition:color .15s}
+.expand-btn:hover{color:var(--gold)}
+
+/* confession card */
+.confession-card{margin:.5rem 1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;box-shadow:var(--shadow)}
+.confession-title{font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:.55rem;font-weight:500}
+.conf-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.conf-label{font-size:.75rem;color:var(--text2);width:90px;flex-shrink:0}
+.conf-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:5px 9px;outline:none;transition:border-color .15s}
+.conf-input:focus{border-color:var(--gold-br)}
+.conf-note{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:7px 9px;resize:none;height:55px;outline:none;transition:border-color .15s;line-height:1.45;margin-top:4px}
+.conf-note::placeholder,.conf-input::placeholder{color:var(--muted)}
+.conf-note:focus{border-color:var(--gold-br)}
+.conf-since{font-size:.72rem;color:var(--acc);margin-top:4px}
+
+/* ── CALENDAR ── */
+.calendar-wrap{margin:.6rem 1.25rem;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:.9rem;box-shadow:var(--shadow)}
+.calendar-title{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem}
+.calendar-grid{display:flex;gap:3px;flex-wrap:wrap}
+.cal-day{width:14px;height:14px;border-radius:3px;background:var(--cal0);cursor:default;transition:transform .1s}
+.cal-day:hover{transform:scale(1.35)}
+.cal-day[data-level="1"]{background:var(--cal1)}
+.cal-day[data-level="2"]{background:var(--cal2)}
+.cal-day[data-level="3"]{background:var(--cal3)}
+.cal-day[data-level="4"]{background:var(--cal4)}
+.calendar-legend{display:flex;align-items:center;gap:4px;margin-top:7px;justify-content:flex-end}
+.legend-label{font-size:.58rem;color:var(--muted)}
+.legend-sq{width:10px;height:10px;border-radius:2px}
+
+/* ── WEEK ── */
+.week-wrap{margin:0 1.25rem .6rem;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:.9rem;box-shadow:var(--shadow)}
+.week-title{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem}
+.week-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.week-day-label{font-size:.56rem;color:var(--muted);margin-bottom:3px}
+.week-day-dot{width:100%;aspect-ratio:1;border-radius:50%;background:var(--cal0);display:flex;align-items:center;justify-content:center;font-size:.52rem;color:transparent;margin:0 auto}
+.week-day-dot.has-data{background:var(--acc-bg);color:var(--acc)}
+.week-day-dot.today{border:1.5px solid var(--gold)}
+.week-day-dot.future{opacity:.3}
+
+/* ── SUMMARY ── */
+.summary-card{margin:.6rem 1.25rem;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);padding:.9rem;box-shadow:var(--shadow)}
+.summary-card-title{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem}
+.summary-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.8rem}
+.summary-row:last-child{border-bottom:none}
+.summary-day{width:26px;font-size:.68rem;color:var(--muted);flex-shrink:0}
+.summary-bar-wrap{flex:1;height:5px;background:var(--cal0);border-radius:99px;overflow:hidden}
+.summary-bar{height:100%;background:var(--acc);border-radius:99px;transition:width .4s}
+.summary-pct{width:30px;text-align:right;font-size:.7rem;color:var(--muted)}
+.summary-check{font-size:.72rem;color:var(--acc)}
+
+/* ── NOTE ── */
+.note-wrap{margin:0 1.25rem .8rem}
+.note-label{font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:.45rem;font-weight:500}
+.note-textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:9px 11px;resize:none;height:72px;outline:none;transition:border-color .15s;line-height:1.5;box-shadow:var(--shadow)}
+.note-textarea::placeholder{color:var(--muted)}
+.note-textarea:focus{border-color:var(--gold-br)}
+.note-saved{font-size:.62rem;color:var(--acc);margin-top:3px;opacity:0;transition:opacity .3s}
+
+/* nakana reminder in ispit */
+.nakana-remind{margin-bottom:6px;padding:8px 10px;background:var(--acc-bg);border:1px solid var(--acc-br);border-radius:var(--rsm);font-size:.76rem;color:var(--text2);line-height:1.45}
+.nakana-remind-label{font-size:.6rem;color:var(--acc);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+
+/* ── AUDIO ── */
+.audio-section{padding:0 1.25rem}
+.audio-group-label{font-size:.64rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin:1rem 0 .45rem;font-weight:500}
+.audio-group-label:first-child{margin-top:.5rem}
+.yt-grid{display:grid;grid-template-columns:1fr;gap:4px}
+@media(min-width:520px){.yt-grid{grid-template-columns:1fr 1fr}}
+.yt-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg2);text-decoration:none;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.yt-btn:hover{border-color:var(--gold-br);background:var(--bg3)}
+.yt-icon{width:27px;height:27px;background:#c00;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.yt-icon svg{width:12px;height:12px;fill:white}
+.yt-text{flex:1;min-width:0}
+.yt-name{font-size:.78rem;font-weight:500;color:var(--text);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yt-sub{font-size:.66rem;color:var(--muted);margin-top:1px}
+.yt-badge{font-size:.58rem;padding:2px 6px;border-radius:99px;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-br);flex-shrink:0}
+.yt-badge.today-badge{background:var(--acc-bg);color:var(--acc);border-color:var(--acc-br)}
+.dnevni-loading{text-align:center;padding:.9rem;font-size:.78rem;color:var(--muted)}
+.refresh-btn{width:100%;padding:7px;border-radius:var(--rsm);border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:.74rem;cursor:pointer;margin-top:5px;transition:all .15s;font-family:'DM Sans',sans-serif}
+.refresh-btn:hover{border-color:var(--gold-br);color:var(--gold)}
+
+/* ── TOOLS ── */
+.tools-wrap{margin:.6rem 1.25rem;display:flex;gap:7px;flex-wrap:wrap}
+.tool-btn{flex:1;min-width:110px;padding:8px 11px;border-radius:var(--rsm);border:1px solid var(--border2);background:var(--bg2);color:var(--text2);font-size:.76rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;box-shadow:var(--shadow)}
+.tool-btn:hover{border-color:var(--gold-br);color:var(--gold)}
+
+/* notif banner */
+.notif-banner{margin:.6rem 1.25rem 0;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rsm);font-size:.76rem;color:var(--text2);display:flex;align-items:center;gap:9px;box-shadow:var(--shadow)}
+.notif-btn{margin-left:auto;flex-shrink:0;padding:4px 11px;border-radius:99px;border:1px solid var(--acc-br);background:var(--acc-bg);color:var(--acc);font-size:.7rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.notif-btn:hover{background:var(--acc);color:white}
+
+.divider{height:1px;background:var(--border);margin:.4rem 1.25rem 0}
+.bottom-pad{height:2rem}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+
+/* PWA install */
+#pwa-install-btn{display:none;position:fixed;bottom:3.8rem;right:1rem;z-index:49;padding:8px 14px;background:var(--acc);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;cursor:pointer;box-shadow:0 3px 12px rgba(122,18,18,0.35);transition:all .2s}
+#pwa-install-btn:hover{transform:translateY(-1px)}
+#pwa-install-btn.visible{display:block}
+#offline-bar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--acc);color:#fff;font-size:.72rem;text-align:center;padding:5px;font-family:'DM Sans',sans-serif}
+#offline-bar.visible{display:block}
+</style>
+</head>
+<body>
+
+<div class="lit-bar" id="lit-bar"></div>
+<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
+
+<!-- ═══ HOME ═══ -->
+<div id="page-home" class="page active">
+<div class="wrap">
+  <div class="home-hero">
+    <div class="home-title">Dnevna rutina</div>
+    <div class="home-sub">Katolička duhovna praksa</div>
+    <div class="home-date" id="home-date"></div>
+    <div class="home-saint" id="home-saint"></div>
+    <div class="home-lit" id="home-lit"></div>
+  </div>
+  <div class="home-grid">
+    <button class="home-btn" onclick="goTo('minimum')">
+      <span class="home-btn-icon">🕊️</span>
+      <div class="home-btn-title">Minimum</div>
+      <div class="home-btn-sub">Realni paket za zauzete dane</div>
+      <span class="home-btn-streak" id="home-streak-min"></span>
+    </button>
+    <button class="home-btn" onclick="goTo('full')">
+      <span class="home-btn-icon">✦</span>
+      <div class="home-btn-title">Full</div>
+      <div class="home-btn-sub">Jutro, dan, večer, tjedno, mjesečno</div>
+      <span class="home-btn-streak" id="home-streak-full"></span>
+    </button>
+    <button class="home-btn" onclick="goTo('audio')">
+      <span class="home-btn-icon">🎵</span>
+      <div class="home-btn-title">Audio</div>
+      <div class="home-btn-sub">Dnevne i stalne molitve</div>
+    </button>
+    <button class="home-btn" onclick="goTo('molitve')">
+      <span class="home-btn-icon">📿</span>
+      <div class="home-btn-title">Molitve</div>
+      <div class="home-btn-sub">Krunice, litanije i ostalo</div>
+    </button>
+  </div>
+  <div style="padding:0 1.25rem .4rem;display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+    <a class="home-btn" href="https://hilp.hr/liturgija-dana/" target="_blank" style="display:block;text-decoration:none;background:var(--bg3);border-color:var(--border2)">
+      <span class="home-btn-icon" style="font-size:1.3rem">📖</span>
+      <div class="home-btn-title">Čitanje dana</div>
+      <div class="home-btn-sub">Liturgijska čitanja · hilp.hr ↗</div>
+    </a>
+    <button class="home-btn" onclick="goTo('dnevnik')" style="background:var(--bg3);border-color:var(--border2)">
+      <span class="home-btn-icon" style="font-size:1.3rem">✍️</span>
+      <div class="home-btn-title">Duhovni dnevnik</div>
+      <div class="home-btn-sub">Bilješke, misli, uvidi</div>
+    </button>
+  </div>
+  <div class="home-quote" id="home-quote"></div>
+</div>
+</div>
+
+<!-- ═══ MINIMUM ═══ -->
+<div id="page-minimum" class="page">
+<div class="wrap">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <div>
+      <div class="page-title">Minimum</div>
+      <div class="page-saint" id="min-saint"></div>
+    </div>
+    <div class="page-day" id="min-day"></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-row"><span>Danas</span><span id="min-progress-text">0 / 0</span></div>
+    <div class="progress-track"><div class="progress-fill" id="min-progress-fill" style="width:0%"></div></div>
+  </div>
+  <div id="min-notif-wrap"></div>
+
+  <div class="section-block">
+    <div class="section-label">Jutro</div>
+    <div class="check-item" data-page="minimum" data-id="m1" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Prikazanje dana</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m1">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="minimum" data-id="m2" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Kratka molitva</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m2">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <!-- reading with reflection -->
+    <div class="check-item" data-page="minimum" data-id="m3" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Kratko čitanje iz Biblije</div><div class="ci-desc">Polako → što te dotiče → kako živjeti danas</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m3">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-minimum-m3" style="width:100%">
+        <div class="ci-expand-label">Što me dotaknulo</div>
+        <textarea class="ci-expand-ta" id="note-minimum-m3" placeholder="Misao iz čitanja..." onclick="event.stopPropagation()" oninput="saveExpandNote('minimum','m3',this)"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('minimum','m3')">✏ bilješka uz čitanje</button></div>
+
+    <!-- Angelus jutro -->
+    <div class="check-item" data-page="minimum" data-id="m4a" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name" id="angelus-min-jutro">Anđeo Gospodnji — jutro</div><div class="ci-desc">6:00</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m4a">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+
+    <!-- nakana dana -->
+    <div class="check-item" data-page="minimum" data-id="m-nakana" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Nakana za danas</div><div class="ci-desc">Konkretna odluka — provjeri navečer u ispitu</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m-nakana">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-minimum-m-nakana" style="width:100%">
+        <div class="ci-expand-label">Moja nakana za danas</div>
+        <textarea class="ci-expand-ta" id="note-minimum-m-nakana" placeholder="Npr. Biti strpljiv u razgovoru..." onclick="event.stopPropagation()" oninput="saveExpandNote('minimum','m-nakana',this)"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('minimum','m-nakana')">✏ upiši nakanu</button></div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Tijekom dana</div>
+    <div class="check-item" data-page="minimum" data-id="m4b" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name" id="angelus-min-podne">Anđeo Gospodnji — podne</div><div class="ci-desc">12:00</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m4b">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="minimum" data-id="m5" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Jedno svjesno dobro djelo</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m5">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="minimum" data-id="m6" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Kratka streličasta molitva</div><div class="ci-desc">Par puta kroz dan</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m6">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Večer</div>
+    <div class="check-item" data-page="minimum" data-id="m4c" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name" id="angelus-min-vecer">Anđeo Gospodnji — večer</div><div class="ci-desc">18:00</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m4c">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="minimum" data-id="m7" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Ispit savjesti</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m7">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-minimum-m7" style="width:100%">
+        <div class="nakana-remind" id="nakana-remind-minimum"></div>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('minimum','m7')">↩ provjeri nakanu</button></div>
+    <div class="check-item" data-page="minimum" data-id="m8" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">1 psalam</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m8">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="minimum" data-id="m9" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Kratka molitva</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m9">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="minimum" data-id="m10" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Desetica krunice</div><div class="ci-desc">Po želji</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m10">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Tjedno</div>
+    <div class="check-item" data-page="minimum" data-id="m11" data-freq="weekly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Nedjeljna misa</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m11">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="minimum" data-id="m12" data-freq="weekly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Klanjanje ili ispovijed</div><div class="ci-desc">Bonus</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-minimum-m12">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Vlastite stavke</div>
+    <div id="custom-items-minimum"></div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="calendar-wrap" style="margin-top:.8rem">
+    <div class="calendar-title">Aktivnost — zadnjih 70 dana</div>
+    <div class="calendar-grid" id="cal-minimum"></div>
+    <div class="calendar-legend">
+      <span class="legend-label">manje</span>
+      <div class="legend-sq" style="background:var(--cal0)"></div>
+      <div class="legend-sq" style="background:var(--cal1)"></div>
+      <div class="legend-sq" style="background:var(--cal2)"></div>
+      <div class="legend-sq" style="background:var(--cal3)"></div>
+      <div class="legend-sq" style="background:var(--cal4)"></div>
+      <span class="legend-label">više</span>
+    </div>
+  </div>
+  <div class="week-wrap">
+    <div class="week-title">Ovaj tjedan</div>
+    <div class="week-days" id="week-minimum"></div>
+  </div>
+  <div class="note-wrap">
+    <div class="note-label">Bilješka za danas</div>
+    <textarea class="note-textarea" id="note-minimum" placeholder="Misao, zahvala, komentar..."></textarea>
+    <div class="note-saved" id="note-saved-minimum">Spremljeno ✓</div>
+  </div>
+  <div class="bottom-pad"></div>
+</div>
+</div>
+
+<!-- ═══ FULL ═══ -->
+<div id="page-full" class="page">
+<div class="wrap">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <div>
+      <div class="page-title">Full rutina</div>
+      <div class="page-saint" id="full-saint"></div>
+    </div>
+    <div class="page-day" id="full-day"></div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-row"><span>Danas</span><span id="full-progress-text">0 / 0</span></div>
+    <div class="progress-track"><div class="progress-fill" id="full-progress-fill" style="width:0%"></div></div>
+  </div>
+  <div id="full-notif-wrap"></div>
+
+  <div class="section-block">
+    <div class="section-label">Jutro</div>
+    <div class="check-item" data-page="full" data-id="f1" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Buđenje + prikazanje dana Bogu</div><div class="ci-desc">Kratka molitva predanja</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f1">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f2" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Jutarnja molitva (10–15 min)</div><div class="ci-desc">Osnovne molitve + razgovor s Bogom</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f2">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <!-- čitanje s bilješkom -->
+    <div class="check-item" data-page="full" data-id="f3" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Čitanja dana s razmatranjem</div><div class="ci-desc">Polako → što te dotiče → kako živjeti danas</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f3">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-full-f3" style="width:100%">
+        <div class="ci-expand-label">Što me dotaknulo danas</div>
+        <textarea class="ci-expand-ta" id="note-full-f3" placeholder="Misao iz čitanja, rečenica, slika..." onclick="event.stopPropagation()" oninput="saveExpandNote('full','f3',this)"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('full','f3')">✏ bilješka uz čitanje</button></div>
+
+    <!-- nakana -->
+    <div class="check-item" data-page="full" data-id="f-nakana" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Nakana za danas</div><div class="ci-desc">Konkretna odluka — provjeri navečer u ispitu</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f-nakana">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-full-f-nakana" style="width:100%">
+        <div class="ci-expand-label">Moja nakana za danas</div>
+        <textarea class="ci-expand-ta" id="note-full-f-nakana" placeholder="Npr. Čuvati jezik u razgovoru..." onclick="event.stopPropagation()" oninput="saveExpandNote('full','f-nakana',this)"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('full','f-nakana')">✏ upiši nakanu</button></div>
+
+    <!-- Angelus jutro -->
+    <div class="check-item" data-page="full" data-id="f8a" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name" id="angelus-full-jutro">Anđeo Gospodnji — jutro</div><div class="ci-desc">6:00</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f8a">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Tijekom dana</div>
+    <!-- lectio divina s bilješkom -->
+    <div class="check-item" data-page="full" data-id="f5" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Lectio divina (15–20 min)</div><div class="ci-desc">Čitanje → razmatranje → molitva → šutnja</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f5">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-full-f5" style="width:100%">
+        <div class="ci-expand-label">Što sam čuo od Boga danas</div>
+        <textarea class="ci-expand-ta" id="note-full-f5" placeholder="Rečenica, slika, osjećaj..." onclick="event.stopPropagation()" oninput="saveExpandNote('full','f5',this)"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('full','f5')">✏ bilješka uz lectio</button></div>
+
+    <div class="check-item" data-page="full" data-id="f6" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Sveta misa</div><div class="ci-desc">Kad je moguće — nedjelja obavezno</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f6">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f7" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Rad kao služenje</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f7">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <!-- Angelus podne -->
+    <div class="check-item" data-page="full" data-id="f8b" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name" id="angelus-full-podne">Anđeo Gospodnji — podne</div><div class="ci-desc">12:00</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f8b">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f9" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Djelo ljubavi (svjesno)</div><div class="ci-desc">Pomoć, strpljenje, žrtva</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f9">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f10" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Krunica Božanskog milosrđa u 15:00</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f10">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f11" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Čuvanje nutarnjeg života</div><div class="ci-desc">Misli, govor, reakcije — kreposti u praksi</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f11">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Večer</div>
+    <!-- Angelus večer -->
+    <div class="check-item" data-page="full" data-id="f8c" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name" id="angelus-full-vecer">Anđeo Gospodnji — večer</div><div class="ci-desc">18:00</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f8c">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f12" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Krunica (klasična)</div><div class="ci-desc">Otajstva dana ili osobni izbor</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f12">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <!-- duhovno čitanje s napomenom -->
+    <div class="check-item" data-page="full" data-id="f13" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Duhovno čitanje (10–15 min)</div><div class="ci-desc">Sv. Augustin, Toma Akvinski, životi svetaca...</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f13">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-full-f13" style="width:100%">
+        <div class="ci-expand-label">Što čitam</div>
+        <textarea class="ci-expand-ta" id="note-full-f13" placeholder="Naslov, autor, stranica, misao..." onclick="event.stopPropagation()" oninput="saveExpandNote('full','f13',this)"></textarea>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('full','f13')">📖 bilješka uz čitanje</button></div>
+
+    <!-- ispit s nakanom -->
+    <div class="check-item" data-page="full" data-id="f14" onclick="toggleItem(this)" style="flex-wrap:wrap">
+      <div class="ci-check" style="flex-shrink:0"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Ispit savjesti (klasični)</div><div class="ci-desc">Dobro — loše — odluka za sutra</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f14">0</div><div class="ci-streak-label">dana</div></div>
+      <div class="ci-expand" id="expand-full-f14" style="width:100%">
+        <div class="nakana-remind" id="nakana-remind-full"></div>
+      </div>
+    </div>
+    <div style="padding:0 0 4px 11px"><button class="expand-btn" onclick="toggleExpand('full','f14')">↩ provjeri nakanu</button></div>
+
+    <div class="check-item" data-page="full" data-id="f15" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Egzamen (po Ignaciju Lojolskom)</div><div class="ci-desc">Zahvalnost → svjetlo → pregled → promašaji → odluka</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f15">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f16" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Čitanje jednog psalma</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f16">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f17" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Večernja molitva + predanje noći</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f17">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Tjedno</div>
+    <div class="check-item" data-page="full" data-id="f18" data-freq="weekly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Sveta misa nedjeljom (temelj)</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f18">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f19" data-freq="weekly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Post ili odricanje (posebno petkom)</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f19">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f20" data-freq="weekly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Euharistijsko klanjanje (barem 1×)</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f20">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Mjesečno</div>
+    <div class="check-item" data-page="full" data-id="f21" data-freq="monthly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Dublji ispit života (30–60 min)</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f21">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f22" data-freq="monthly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Duhovni cilj za mjesec</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f22">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f23" data-freq="monthly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Duhovni razgovor / vodstvo</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f23">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+    <div class="check-item" data-page="full" data-id="f24" data-freq="monthly" onclick="toggleItem(this)">
+      <div class="ci-check"><div class="ci-check-inner"></div></div>
+      <div class="ci-body"><div class="ci-name">Dan sabranosti (mini "povlačenje")</div></div>
+      <div class="ci-streak"><div class="ci-streak-num" id="s-full-f24">0</div><div class="ci-streak-label">dana</div></div>
+    </div>
+  </div>
+
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Vlastite stavke</div>
+    <div id="custom-items-full"></div>
+  </div>
+
+  <!-- ispovijed tracker -->
+  <div class="divider"></div>
+  <div class="confession-card" style="margin-top:.8rem">
+    <div class="confession-title">Ispovijed</div>
+    <div class="conf-row">
+      <div class="conf-label">Zadnja ispovijed</div>
+      <input type="date" class="conf-input" id="conf-date" onchange="saveConf()">
+    </div>
+    <div class="conf-since" id="conf-since"></div>
+    <textarea class="conf-note" id="conf-note" placeholder="Napomena (nije za sadržaj ispovijedi)..." oninput="saveConf()"></textarea>
+  </div>
+
+  <div class="divider"></div>
+  <div class="calendar-wrap" style="margin-top:.8rem">
+    <div class="calendar-title">Aktivnost — zadnjih 70 dana</div>
+    <div class="calendar-grid" id="cal-full"></div>
+    <div class="calendar-legend">
+      <span class="legend-label">manje</span>
+      <div class="legend-sq" style="background:var(--cal0)"></div>
+      <div class="legend-sq" style="background:var(--cal1)"></div>
+      <div class="legend-sq" style="background:var(--cal2)"></div>
+      <div class="legend-sq" style="background:var(--cal3)"></div>
+      <div class="legend-sq" style="background:var(--cal4)"></div>
+      <span class="legend-label">više</span>
+    </div>
+  </div>
+  <div class="week-wrap">
+    <div class="week-title">Ovaj tjedan</div>
+    <div class="week-days" id="week-full"></div>
+  </div>
+  <div class="note-wrap">
+    <div class="note-label">Bilješka za danas</div>
+    <textarea class="note-textarea" id="note-full" placeholder="Misao, zahvala, komentar..."></textarea>
+    <div class="note-saved" id="note-saved-full">Spremljeno ✓</div>
+  </div>
+  <div class="divider"></div>
+  <div class="tools-wrap">
+    <button class="tool-btn" onclick="exportData()">⬇ Izvezi lokalno</button>
+    <button class="tool-btn" onclick="document.getElementById('import-file').click()">⬆ Uvezi lokalno</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="tool-btn" onclick="goTo('summary')">📊 Tjedni sažetak</button>
+  </div>
+  <div class="tools-wrap" style="margin-top:0">
+    <button class="tool-btn" id="drive-save-btn" onclick="driveSave()" style="border-color:var(--gold-br);color:var(--gold)">
+      <span id="drive-save-label">☁ Spremi na Drive</span>
+    </button>
+    <button class="tool-btn" id="drive-load-btn" onclick="driveLoad()" style="border-color:var(--gold-br);color:var(--gold)">
+      <span id="drive-load-label">☁ Učitaj s Drivea</span>
+    </button>
+  </div>
+  <div id="drive-status" style="margin:0 1.25rem .4rem;font-size:.72rem;color:var(--muted);min-height:1rem"></div>
+  <div class="bottom-pad"></div>
+</div>
+</div>
+
+<!-- ═══ SUMMARY ═══ -->
+<div id="page-summary" class="page">
+<div class="wrap">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('full')">←</button>
+    <div class="page-title">Tjedni sažetak</div>
+    <div class="page-day" id="summary-week-label"></div>
+  </div>
+  <div id="summary-content"></div>
+  <div class="bottom-pad"></div>
+</div>
+</div>
+
+<!-- ═══ AUDIO ═══ -->
+<div id="page-audio" class="page">
+<div class="wrap">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <div class="page-title">Audio</div>
+    <div class="page-day" id="audio-day"></div>
+  </div>
+  <div class="audio-section">
+    <div class="audio-group-label">Dnevno razmatranje — @PodSmokvom</div>
+    <div class="dnevni-loading" id="dnevni-loading">Učitavam najnoviji video...</div>
+    <div class="yt-grid" id="dnevni-result"></div>
+    <button class="refresh-btn" onclick="loadDnevni(true)">↺ Osvježi</button>
+    <div class="audio-group-label">Dnevna krunica</div>
+    <div class="yt-grid" id="audio-dnevna-krunica"></div>
+    <div class="audio-group-label">Jutro</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=NHrzp-jvGUo" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Jutarnja molitva + predanje Bogu</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=gFajKJYwaSQ" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Jutarnji molitveni čas</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/@PodSmokvom" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Čitanje dana s razmatranjem</div><div class="yt-sub">@PodSmokvom</div></div></a>
+    </div>
+    <div class="audio-group-label">Tijekom dana</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=nHVPYgQkHVc" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Angelus — jutro / podne / večer</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=iGKp0HdSykw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica Božjeg milosrđa (15:00)</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=08FAIhGjOgw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Dnevna sv. Misa</div></div></a>
+    </div>
+    <div class="audio-group-label">Večer</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=Up3znCJEFAQ" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Večernja molitva</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=CkzinOOkSjw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Ispit savjesti / egzamen</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=nu3BUKpJHFA&list=PLi3iUNXPgA_gNacvdlme4JZqirKbMQ2hn" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Čitanje psalma</div><div class="yt-sub">Playlist</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=54Lxp_Wvb14&list=PLPg96Gwgu13X4dpP0q9DVPHVyqApMOOtl" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Euharistijsko klanjanje</div><div class="yt-sub">Playlist</div></div></a>
+    </div>
+  </div>
+  <div class="bottom-pad"></div>
+</div>
+</div>
+
+<!-- ═══ MOLITVE ═══ -->
+<div id="page-molitve" class="page">
+<div class="wrap">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <div class="page-title">Molitve</div>
+  </div>
+  <div class="audio-section">
+    <div class="audio-group-label">Gospina krunica</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=AySqgpBXsdA" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Radosna otajstva</div><div class="yt-sub">pon, sub</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=TZNmeYhEtLA" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Žalosna otajstva</div><div class="yt-sub">uto, pet</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=wC9_N6s2qF0" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Slavna otajstva</div><div class="yt-sub">sri, ned</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=6lNSAOB0UR4" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Otajstva svjetla</div><div class="yt-sub">čet</div></div></a>
+    </div>
+    <div class="audio-group-label">Ostale krunice</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=7H_isfJrCKs" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica sv. Josipa</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=iGKp0HdSykw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica Božjeg milosrđa</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=FeGtaNwsmMA" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Zlatna krunica</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=cpvO3A3nA8k" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica Krvi Kristove</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=_r2MuNzriiE" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica Duhu Svetom</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=qYWuN3N6FQM" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Mala krunica Duhu Svetom</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=CVVhn_s_mvk" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica sv. Mihaelu</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=vOlXgOG84P4" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica pobjede</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=iOLuPp_VVjY" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica oslobođenja</div></div></a>
+    </div>
+    <div class="audio-group-label">Litanije</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=dCXradyDtjg" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Litanije poniznosti</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=T5y33PUAtxo" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Litanije Presvetog Srca</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=mdpeyQ6V4TY" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Litanije BDM (Lauretanske)</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=3dVIfbqqIws" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Litanije sv. Josipu</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=-bMUDkHTGxM" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Litanije svih svetih</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=JqTCYCBQfTw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Zazivi Božjem milosrđu</div></div></a>
+    </div>
+    <div class="audio-group-label">Molitve</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=xQjVOnAGczc" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Molitva Ocu nebeskom</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=NHrzp-jvGUo" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Jutarnja molitva</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=Up3znCJEFAQ" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Večernja molitva</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=X14WGq9BmOE" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Put križa (tradicionalni)</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=y1jxVLiKn4M" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Molitva sv. Mihaelu arkanđelu</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=b9VLvg6YmKk" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Himan Duhu Svetom</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=iHnmHlADQ1o" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Desiderata</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=POkqfyrsRk4" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Meditacija — put u Emaus</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=Isk-U74KFSg" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Kraljice neba, raduj se</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=GV1r39Erjn8" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Molitva za obitelj</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=S_faPOJ06JI" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Molitva za svećenike</div></div></a>
+    </div>
+  </div>
+  <div class="bottom-pad"></div>
+</div>
+</div>
+
+
+<!-- ═══ DUHOVNI DNEVNIK ═══ -->
+<div id="page-dnevnik" class="page">
+<div class="wrap">
+  <div class="page-header">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <div class="page-title">Duhovni dnevnik</div>
+    <div class="page-day" id="dnevnik-day"></div>
+  </div>
+
+  <!-- nova bilješka -->
+  <div class="section-block">
+    <div class="section-label">Nova bilješka</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem;box-shadow:var(--shadow)">
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <div style="font-size:.7rem;color:var(--muted);width:52px;flex-shrink:0">Datum</div>
+        <input type="date" id="dnevnik-date-input"
+          style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:5px 9px;outline:none">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <div style="font-size:.7rem;color:var(--muted);width:52px;flex-shrink:0">Redak</div>
+        <input type="text" id="dnevnik-verse-input" placeholder="npr. Iv 15,12 ili vlasteni naslov..."
+          style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:5px 9px;outline:none">
+      </div>
+      <textarea id="dnevnik-content-input" placeholder="Misao, molitva, uvid, zahvala..." rows="5"
+        style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:8px 10px;resize:none;outline:none;line-height:1.5;margin-bottom:8px"></textarea>
+      <button onclick="saveDnevnikEntry()"
+        style="width:100%;padding:9px;border-radius:var(--rsm);border:1px solid var(--acc-br);background:var(--acc-bg);color:var(--acc);font-size:.82rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s">
+        Spremi bilješku
+      </button>
+    </div>
+  </div>
+
+  <!-- prikaz bilješki -->
+  <div class="section-block" style="padding-top:0">
+    <div class="section-label">Prethodne bilješke</div>
+    <div id="dnevnik-list"></div>
+  </div>
+
+  <div class="bottom-pad"></div>
+</div>
+</div>
+
+<!-- ☕ KAVA BUTTON -->
+<button id="kava-btn" onclick="openKava()">☕ Kupi mi kavu</button>
+
+<div id="kava-overlay" onclick="if(event.target===this)closeKava()">
+  <div id="kava-box">
+    <h2>☕ Hvala!</h2>
+    <p>
+      Drago mi je da ti je app koristan!<br>
+      Ako želiš podržati razvoj, možeš mi kupiti virtualnu kavu. 🙏
+    </p>
+    <a id="kava-paypal" href="https://www.paypal.com/paypalme/racicv" target="_blank">☕ Kupi kavu na PayPalu</a>
+    <a id="kava-bmc" href="https://buymeacoffee.com/racicv" target="_blank">☕ Buy Me a Coffee</a>
+    <button id="kava-close" onclick="closeKava()">Možda drugi put</button>
+  </div>
+</div>
+
+<div id="offline-bar">📵 Offline — podaci sačuvani lokalno</div>
+<button id="pwa-install-btn" onclick="installPWA()">⬇ Instaliraj app</button>
+
+<style>
+#kava-btn{position:fixed;bottom:1.2rem;right:1rem;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:7px 13px;font-size:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:50;transition:transform .15s;font-family:'DM Sans',sans-serif;color:var(--text2)}
+#kava-btn:hover{transform:scale(1.05)}
+#kava-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:180;font-family:'DM Sans',sans-serif}
+#kava-overlay.show{display:flex}
+#kava-box{background:var(--bg2);border-radius:16px;padding:2rem;max-width:340px;width:94%;text-align:center;border:1px solid var(--border)}
+#kava-box h2{font-size:20px;font-weight:500;margin-bottom:.6rem;color:var(--text);font-family:'Cormorant Garamond',serif}
+#kava-box p{color:var(--text2);font-size:13px;line-height:1.6;margin-bottom:1.1rem}
+#kava-paypal{display:block;padding:11px 24px;background:#0070ba;color:white;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;margin:0 auto .6rem;text-align:center;transition:background .15s}
+#kava-paypal:hover{background:#005a96}
+#kava-bmc{display:block;padding:11px 24px;background:#FFDD00;color:#000;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;margin:0 auto .6rem;text-align:center;transition:background .15s}
+#kava-bmc:hover{background:#f0ce00}
+#kava-close{display:block;margin:.4rem auto 0;padding:7px 18px;border:1px solid var(--border2);border-radius:8px;background:transparent;cursor:pointer;font-size:12px;color:var(--muted);font-family:'DM Sans',sans-serif}
+#kava-close:hover{background:var(--bg3)}
+</style>
+
+<script>
+// ─── QUOTES ───
+const QUOTES=['Tražite najprije kraljevstvo Božje i pravednost njegovu, a sve ostalo bit će vam pridodano. — Mt 6,33','Sve mogu u onome koji me jača. — Fil 4,13','Gospodin je pastir moj, ni u čem neću imati nedostatka. — Ps 23,1','Ljubite jedni druge kao što sam ja ljubio vas. — Iv 15,12','Ne bojte se! Ja sam s vama u sve dane do svršetka svijeta. — Mt 28,20','Gdje je ljubav i dobrota, onde je Bog.','Molitva je dizanje srca i duha k Bogu. — sv. Ivan Vianney','Čovjek je stvoren za Boga i nemiran je dok ne počine u njemu. — sv. Augustin','Daj mi, Gospodine, da tražim tebe.','Ništa te ne smeta, ništa te ne plaši... Tko ima Boga, ništa mu ne nedostaje. — sv. Terezija Avilska','Uvijek se radujte. Neprestano molite. U svemu zahvaljujte. — 1 Sol 5,16-18','Gospodine, učini me oruđem svoga mira. — sv. Franjo Asiški'];
+
+const KRUNICA_MAP=[
+  {label:'Slavna otajstva',url:'https://www.youtube.com/watch?v=wC9_N6s2qF0',days:'sri, ned'},
+  {label:'Radosna otajstva',url:'https://www.youtube.com/watch?v=AySqgpBXsdA',days:'pon, sub'},
+  {label:'Žalosna otajstva',url:'https://www.youtube.com/watch?v=TZNmeYhEtLA',days:'uto, pet'},
+  {label:'Slavna otajstva',url:'https://www.youtube.com/watch?v=wC9_N6s2qF0',days:'sri, ned'},
+  {label:'Otajstva svjetla',url:'https://www.youtube.com/watch?v=6lNSAOB0UR4',days:'čet'},
+  {label:'Žalosna otajstva',url:'https://www.youtube.com/watch?v=TZNmeYhEtLA',days:'uto, pet'},
+  {label:'Radosna otajstva',url:'https://www.youtube.com/watch?v=AySqgpBXsdA',days:'pon, sub'},
+];
+
+const DAY_NAMES=['ned','pon','uto','sri','čet','pet','sub'];
+const MONTH_NAMES=['sij','velj','ožu','tra','svi','lip','srp','kol','ruj','lis','stu','pro'];
+
+// ─── LITURGICAL SEASONS (approximate, computed) ───
+// Returns {season, color, label} for a given date
+function getLiturgical(d) {
+  const y=d.getFullYear(), m=d.getMonth()+1, day=d.getDate();
+  // Easter Sunday (anonymous Gregorian algorithm)
+  function easter(yr){const a=yr%19,b=Math.floor(yr/100),c=yr%100,dd=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-dd-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),dy=(h+l-7*mm+114)%31+1;return new Date(yr,mo-1,dy)}
+  const easterD=easter(y);
+  function addDays(dt,n){const r=new Date(dt);r.setDate(r.getDate()+n);return r}
+  function sameOrAfter(a,b){return a>=b}
+  function before(a,b){return a<b}
+  const curr=new Date(y,m-1,day);
+  // Advent: 4th Sunday before Dec 25
+  function advent(yr){const christmas=new Date(yr,11,25);const dow=christmas.getDay();const fourthSun=new Date(yr,11,25-dow-21);return fourthSun}
+  const adventStart=advent(y);
+  const adventEnd=new Date(y,11,24);
+  const christmasEnd=new Date(y,0,9); // Baptism of Lord ~Jan 9
+  const christmasStart=new Date(y,11,25);
+  const ashWed=addDays(easterD,-46);
+  const easterEnd=addDays(easterD,49); // Pentecost
+  const corpusChristi=addDays(easterD,60);
+
+  // Uskrsno/Resurrection season has Regina Caeli instead of Angelus
+  const isEasterTime=sameOrAfter(curr,easterD)&&before(curr,easterEnd);
+
+  if(sameOrAfter(curr,adventStart)&&sameOrAfter(new Date(y,11,24),curr))
+    return{season:'advent',color:'#7c3fa0',label:'Došašće',easterTime:false};
+  if((sameOrAfter(curr,christmasStart)||before(curr,christmasEnd)))
+    return{season:'christmas',color:'#c9a84c',label:'Božić',easterTime:false};
+  if(sameOrAfter(curr,ashWed)&&before(curr,easterD))
+    return{season:'lent',color:'#7c3fa0',label:'Korizma',easterTime:false};
+  // Pentecost Sunday = easterD+49, red
+  const pentecost=addDays(easterD,49);
+  if(dateKey(curr)===dateKey(pentecost))
+    return{season:'pentecost',color:'#c0392b',label:'Duhovi',easterTime:false};
+  if(isEasterTime)
+    return{season:'easter',color:'#c9a84c',label:'Uskrsno vrijeme',easterTime:true};
+  // Ordinary time
+  return{season:'ordinary',color:'#2e7d32',label:'Nedjelja kroz godinu',easterTime:false};
+}
+
+// Saint of day — curated static list for HR context
+const SAINTS={
+  '04-18':'Sv. Galdino, nadbiskup',
+  '04-19':'Sv. Leo IX., papa',
+  '04-20':'Bl. Marko iz Aviana',
+  '04-21':'Sv. Anzelmo, nadbiskup',
+  '04-22':'Sv. Gaj, papa',
+  '04-23':'Sv. Juraj, mučenik',
+  '04-24':'Sv. Fidel iz Sigmaringena',
+  '04-25':'Sv. Marko, evanđelist',
+  '04-26':'Sv. Kletus i Marcelin, pape',
+  '04-27':'Sv. Zita',
+  '04-28':'Sv. Petar Chanel, mučenik',
+  '04-29':'Sv. Katarina Sijenska',
+  '04-30':'Sv. Pio V., papa',
+  '05-01':'Sv. Josip radnik',
+  '05-02':'Sv. Atanazije, nadbiskup',
+  '05-03':'Sv. Filip i Jakov, apostoli',
+  '05-04':'Sv. Florijana, mučenik',
+  '05-05':'Bl. Alojzije Stepinac',
+  '05-06':'Sv. Dominik Savio',
+  '05-07':'Bl. Benedikt XI.',
+  '05-08':'Sv. Poncijan, mučenik',
+  '05-09':'Sv. Izidor Farmer',
+  '05-10':'Sv. Job',
+  '05-11':'Sv. Mamert, nadbiskup',
+  '05-12':'Sv. Pankracije, mučenik',
+  '05-13':'Gospa Fatimska',
+  '05-14':'Sv. Matija, apostol',
+  '05-15':'Sv. Izidor Oratar',
+  '05-16':'Sv. Brendan, opat',
+  '05-17':'Sv. Paskal Baylon',
+  '05-18':'Sv. Ivan I., papa',
+  '05-19':'Sv. Ivo Hélory, svećenik',
+  '05-20':'Sv. Bernardin Sijenskki',
+  '05-21':'Sv. Kristofor Magallanes',
+  '05-22':'Sv. Rita iz Cassije',
+  '05-23':'Sv. Ivan Rosmini',
+  '05-24':'Gospa Marija Pomoćnica',
+  '05-25':'Sv. Beda Časni',
+  '05-26':'Sv. Filip Neri',
+  '05-27':'Sv. Augustin od Canterburyja',
+  '05-28':'Sv. German od Pariza',
+  '05-29':'Sv. Pavao VI. (bl.)',
+  '05-30':'Sv. Joana Darc',
+  '05-31':'Pohođenje Bl. Djevice Marije',
+  '06-01':'Sv. Justin, mučenik',
+  '06-02':'Sv. Marcelin i Petar',
+  '06-03':'Sv. Karlo Lwanga i dr.',
+  '06-04':'Sv. Franjo Caracciolo',
+  '06-05':'Sv. Bonifacije, mučenik',
+  '06-06':'Sv. Norberto, nadbiskup',
+  '06-07':'Sv. Robert Bellarmin',
+  '06-08':'Sv. Medard, nadbiskup',
+  '06-09':'Sv. Efrema Sirijac',
+  '06-10':'Sv. Landelin, mučenik',
+  '06-11':'Sv. Barnaba, apostol',
+  '06-12':'Sv. Onufrije',
+  '06-13':'Sv. Antun Padovanski',
+  '06-14':'Sv. Elizej, prorok',
+  '06-15':'Sv. Vida, mučenik',
+  '06-16':'Sv. Tihomir',
+  '06-17':'Sv. Albert Chmielowski',
+  '06-18':'Sv. Grgur Barbarigo',
+  '06-19':'Sv. Romualda, opat',
+  '06-20':'Sv. Silverije, papa',
+  '06-21':'Sv. Alojzije Gonzaga',
+  '06-22':'Sv. Ivan Fisher i Toma More',
+  '06-23':'Sv. Josip Cafasso',
+  '06-24':'Rođenje sv. Ivana Krstitelja',
+  '06-25':'Sv. Prošper iz Aquitaine',
+  '06-26':'Sv. Josemaría Escrivá',
+  '06-27':'Sv. Cirila Aleksandrijskog',
+  '06-28':'Sv. Irenej, nadbiskup',
+  '06-29':'Sv. Petar i Pavao, apostoli',
+  '06-30':'Prvosvećenički blagdan Svetih apostola',
+  '01-01':'Marija, Majka Božja',
+  '01-06':'Bogojavljenje — Tri kralja',
+  '01-17':'Sv. Antun, opat',
+  '01-24':'Sv. Franjo Saleški',
+  '01-25':'Obraćenje sv. Pavla',
+  '01-28':'Sv. Toma Akvinski',
+  '02-02':'Prikazanje Gospodinovo — Svijećnica',
+  '02-11':'Gospa Lurdska',
+  '02-14':'Sv. Valentin, mučenik',
+  '02-22':'Sv. Petar Apostol — stolica',
+  '03-17':'Sv. Patriko',
+  '03-19':'Sv. Josip, zaručnik Marijin',
+  '03-25':'Navještenje Gospodinovo',
+  '07-11':'Sv. Benedikt, opat — zaštitnik Europe',
+  '07-22':'Sv. Marija Magdalena',
+  '07-25':'Sv. Jakov, apostol',
+  '07-26':'Sv. Joakim i Ana',
+  '08-04':'Sv. Ivan Marija Vianney',
+  '08-06':'Preobraženje Gospodinovo',
+  '08-10':'Sv. Lovro, đakon i mučenik',
+  '08-14':'Sv. Maksimilijan Kolbe',
+  '08-15':'Uznesenje BDM',
+  '08-22':'Marija Kraljica',
+  '08-28':'Sv. Augustin, nadbiskup',
+  '09-08':'Rođenje BDM',
+  '09-14':'Uzvišenje sv. Križa',
+  '09-15':'Gospa Žalosna',
+  '09-21':'Sv. Matej, apostol',
+  '09-29':'Sv. Mihovil, Gabrijel i Rafael',
+  '09-30':'Sv. Jeronim',
+  '10-01':'Sv. Terezija Djeteta Isusa',
+  '10-02':'Sveti anđeli čuvari',
+  '10-04':'Sv. Franjo Asiški',
+  '10-07':'Gospa Kruničarska',
+  '10-15':'Sv. Terezija Avilska',
+  '10-16':'Sv. Hedviga; Sv. Margarita Marija',
+  '10-18':'Sv. Luka, evanđelist',
+  '10-22':'Sv. Ivan Pavao II.',
+  '10-28':'Sv. Šimun i Juda, apostoli',
+  '11-01':'Svi sveti',
+  '11-02':'Dušni dan',
+  '11-04':'Sv. Karlo Boromejski',
+  '11-09':'Posveta Bazilike sv. Ivana Lateranskog',
+  '11-11':'Sv. Martin iz Toursa',
+  '11-13':'Sv. Stanislav Kostka',
+  '11-21':'Prikazanje BDM',
+  '11-22':'Sv. Cecilija, djevica i mučenica',
+  '11-25':'Sv. Katarina Aleksandrijska',
+  '11-30':'Sv. Andrija, apostol',
+  '12-03':'Sv. Franjo Ksaverski',
+  '12-06':'Sv. Nikola, nadbiskup',
+  '12-08':'Bezgrješno začeće BDM',
+  '12-12':'Gospa Guadalupska',
+  '12-13':'Sv. Lucija, mučenica',
+  '12-25':'Božić — Rođenje Isusovo',
+  '12-26':'Sv. Stjepan, prvomučenik',
+  '12-27':'Sv. Ivan, apostol i evanđelist',
+  '12-28':'Nevina djeca, mučenici',
+};
+
+function getSaint(d){
+  const key=`${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return SAINTS[key]||'';
+}
+
+// ─── UTILS ───
+function todayKey(){const d=new Date();return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`}
+function dateKey(d){return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`}
+function p2(n){return String(n).padStart(2,'0')}
+function formatDate(d){return`${DAY_NAMES[d.getDay()]}, ${d.getDate()}. ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}.`}
+function load(key,def){try{const v=localStorage.getItem(key);return v?JSON.parse(v):def}catch{return def}}
+function save(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch{}}
+
+// ─── THEME ───
+function initTheme(){const t=load('theme','light');document.documentElement.dataset.theme=t;document.getElementById('theme-btn').textContent=t==='light'?'🌙':'☀️'}
+function toggleTheme(){const cur=document.documentElement.dataset.theme;const next=cur==='light'?'dark':'light';document.documentElement.dataset.theme=next;save('theme',next);document.getElementById('theme-btn').textContent=next==='light'?'🌙':'☀️'}
+
+// ─── LITURGICAL UI ───
+let litData=null;
+// Liturgical text colors per season
+const LIT_TEXT_COLORS={
+  advent:'#7c3fa0',    // purple
+  lent:'#7c3fa0',      // purple
+  christmas:'#c9a84c', // gold/white-ish
+  easter:'#c9a84c',    // gold (white would disappear on light bg)
+  pentecost:'#c0392b', // red
+  ordinary:'#2e7d32',  // green
+};
+function applyLiturgical(){
+  const d=new Date();
+  litData=getLiturgical(d);
+  document.getElementById('lit-bar').style.background=litData.color;
+  document.documentElement.style.setProperty('--lit-color',litData.color);
+  const litEl=document.getElementById('home-lit');
+  if(litEl){
+    litEl.textContent=litData.label;
+    litEl.style.color=LIT_TEXT_COLORS[litData.season]||'var(--muted)';
+  }
+  // Angelus vs Regina Caeli
+  const angelusLabel=litData.easterTime?'Kraljice neba — jutro':'Anđeo Gospodnji — jutro';
+  const angelusPodne=litData.easterTime?'Kraljice neba — podne':'Anđeo Gospodnji — podne';
+  const angelusVecer=litData.easterTime?'Kraljice neba — večer':'Anđeo Gospodnji — večer';
+  ['angelus-min-jutro','angelus-full-jutro'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=angelusLabel});
+  ['angelus-min-podne','angelus-full-podne'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=angelusPodne});
+  ['angelus-min-vecer','angelus-full-vecer'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=angelusVecer});
+}
+
+// ─── SAINT ───
+function applySaint(){
+  const d=new Date();
+  const saint=getSaint(d);
+  ['home-saint','min-saint','full-saint'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=saint?`✦ ${saint}`:''});
+}
+
+// ─── NAV ───
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(page==='minimum')initChecklist('minimum');
+  if(page==='full'){initChecklist('full');loadConf()}
+  if(page==='audio')initAudio();
+  if(page==='summary')initSummary();
+  if(page==='dnevnik')initDnevnik();
+  window.scrollTo(0,0);
+}
+
+// ─── CHECKS ───
+function getTodayChecks(page){return(load(`checks-${page}`,{})[todayKey()])||{}}
+function saveTodayChecks(page,checks){const all=load(`checks-${page}`,{});all[todayKey()]=checks;save(`checks-${page}`,all)}
+
+function getStreak(page,id){
+  const all=load(`checks-${page}`,{});
+  let streak=0,started=false;
+  const d=new Date();
+  for(let i=0;i<1500;i++){
+    const k=dateKey(d);
+    if(all[k]&&all[k][id]){streak++;started=true;}
+    else if(i===0&&!started){d.setDate(d.getDate()-1);continue}
+    else if(started)break;
+    else if(i>1)break;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+function initChecklist(page){
+  const today=getTodayChecks(page);
+  const items=document.querySelectorAll(`.check-item[data-page="${page}"]`);
+  let total=0,done=0;
+  items.forEach(item=>{
+    const id=item.dataset.id;
+    if(today[id]){item.classList.add('done')}
+    else item.classList.remove('done');
+    const el=document.getElementById(`s-${page}-${id}`);
+    if(el)el.textContent=getStreak(page,id);
+    if(item.dataset.freq!=='weekly'&&item.dataset.freq!=='monthly'){
+      total++;
+      if(today[id])done++;
+    }
+  });
+  updateProgress(page,done,total);
+  renderCalendar(page);
+  renderWeek(page);
+  loadNote(page);
+  loadExpandNotes(page);
+  loadCustomItems(page);
+  renderNakanaReminder(page);
+  renderNotifBanner(page);
+  const dayId=page==='minimum'?'min-day':'full-day';
+  const el=document.getElementById(dayId);
+  if(el)el.textContent=formatDate(new Date());
+}
+
+function toggleItem(el){
+  const page=el.dataset.page,id=el.dataset.id;
+  const today=getTodayChecks(page);
+  today[id]=!el.classList.contains('done');
+  saveTodayChecks(page,today);
+  el.classList.toggle('done');
+  const items=document.querySelectorAll(`.check-item[data-page="${page}"]`);
+  let total=0,done=0;
+  items.forEach(i=>{
+    if(i.dataset.freq!=='weekly'&&i.dataset.freq!=='monthly'){
+      total++;
+      if(i.classList.contains('done'))done++;
+    }
+  });
+  updateProgress(page,done,total);
+  const sEl=document.getElementById(`s-${page}-${id}`);
+  if(sEl)sEl.textContent=getStreak(page,id);
+  renderCalendar(page);
+  renderWeek(page);
+  updateHomeStreaks();
+}
+
+function updateProgress(page,done,total){
+  const prefix=page==='minimum'?'min':'full';
+  const pct=total>0?Math.round((done/total)*100):0;
+  const t=document.getElementById(`${prefix}-progress-text`);
+  const f=document.getElementById(`${prefix}-progress-fill`);
+  if(t)t.textContent=`${done} / ${total}`;
+  if(f)f.style.width=pct+'%';
+}
+
+// ─── EXPAND NOTES ───
+function toggleExpand(page,id){
+  const el=document.getElementById(`expand-${page}-${id}`);
+  if(el)el.classList.toggle('open');
+}
+function saveExpandNote(page,id,ta){
+  save(`expand-${page}-${id}-${todayKey()}`,ta.value);
+}
+function loadExpandNotes(page){
+  document.querySelectorAll(`[id^="note-${page}-"]`).forEach(ta=>{
+    const parts=ta.id.split('-');
+    const id=parts.slice(2).join('-');
+    ta.value=load(`expand-${page}-${id}-${todayKey()}`,'');
+  });
+}
+
+// ─── NAKANA REMINDER ───
+function renderNakanaReminder(page){
+  const nakanaKey=page==='minimum'?'m-nakana':'f-nakana';
+  const nakana=load(`expand-${page}-${nakanaKey}-${todayKey()}`,'');
+  const remindId=`nakana-remind-${page}`;
+  const el=document.getElementById(remindId);
+  if(!el)return;
+  if(nakana){
+    el.style.display='block';
+    el.innerHTML=`<div class="nakana-remind-label">Jutarnja nakana</div>${nakana}`;
+  } else {
+    el.style.display='none';
+  }
+}
+
+// ─── CALENDAR ───
+function getDayLevel(page,key){
+  const all=load(`checks-${page}`,{});
+  const dayData=all[key]||{};
+  const count=Object.values(dayData).filter(Boolean).length;
+  const items=document.querySelectorAll(`.check-item[data-page="${page}"]`);
+  const total=items.length||1;
+  const pct=count/total;
+  if(pct===0)return 0;if(pct<0.25)return 1;if(pct<0.5)return 2;if(pct<0.75)return 3;return 4;
+}
+function renderCalendar(page){
+  const el=document.getElementById(`cal-${page}`);
+  if(!el)return;
+  el.innerHTML='';
+  const today=new Date();
+  for(let i=69;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const k=dateKey(d);const level=getDayLevel(page,k);
+    const sq=document.createElement('div');sq.className='cal-day';
+    if(level>0)sq.dataset.level=level;sq.title=k;
+    el.appendChild(sq);
+  }
+}
+function renderWeek(page){
+  const el=document.getElementById(`week-${page}`);
+  if(!el)return;
+  el.innerHTML='';
+  const today=new Date();
+  const monday=new Date(today);monday.setDate(today.getDate()-((today.getDay()+6)%7));
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const k=dateKey(d);const isToday=k===todayKey();const isFuture=d>today;
+    const level=getDayLevel(page,k);
+    const col=document.createElement('div');
+    col.innerHTML=`<div class="week-day-label">${DAY_NAMES[d.getDay()]}</div><div class="week-day-dot${level>0?' has-data':''}${isToday?' today':''}${isFuture?' future':''}">${level>0?'✓':''}</div>`;
+    el.appendChild(col);
+  }
+}
+
+// ─── SUMMARY ───
+function initSummary(){
+  const today=new Date();
+  const monday=new Date(today);monday.setDate(today.getDate()-((today.getDay()+6)%7));
+  const sunday=new Date(monday);sunday.setDate(monday.getDate()+6);
+  document.getElementById('summary-week-label').textContent=`${monday.getDate()}. ${MONTH_NAMES[monday.getMonth()]} – ${sunday.getDate()}. ${MONTH_NAMES[sunday.getMonth()]}`;
+  let html='';
+  ['minimum','full'].forEach(page=>{
+    const label=page==='minimum'?'Minimum':'Full';
+    const items=document.querySelectorAll(`.check-item[data-page="${page}"]`);
+    const total=items.length;
+    html+=`<div class="summary-card"><div class="summary-card-title">${label} — po danima</div>`;
+    for(let i=0;i<7;i++){
+      const d=new Date(monday);d.setDate(monday.getDate()+i);
+      const k=dateKey(d);const isFuture=d>today;
+      const all=load(`checks-${page}`,{});const dayData=all[k]||{};
+      const count=Object.values(dayData).filter(Boolean).length;
+      const pct=total>0?Math.round((count/total)*100):0;
+      html+=`<div class="summary-row"><div class="summary-day">${DAY_NAMES[d.getDay()]}</div><div class="summary-bar-wrap"><div class="summary-bar" style="width:${isFuture?0:pct}%"></div></div><div class="summary-pct">${isFuture?'—':pct+'%'}</div>${getDayLevel(page,k)===4&&!isFuture?'<div class="summary-check">✓</div>':''}</div>`;
+    }
+    html+='</div>';
+  });
+  // streaks
+  html+='<div class="summary-card"><div class="summary-card-title">Najduži streakovi</div>';
+  const allItems=[...Array.from(document.querySelectorAll('.check-item[data-page="minimum"]')).map(el=>({page:'minimum',id:el.dataset.id,name:el.querySelector('.ci-name').textContent})),...Array.from(document.querySelectorAll('.check-item[data-page="full"]')).map(el=>({page:'full',id:el.dataset.id,name:el.querySelector('.ci-name').textContent}))];
+  const withStreaks=allItems.map(it=>({...it,streak:getStreak(it.page,it.id)})).filter(it=>it.streak>0).sort((a,b)=>b.streak-a.streak).slice(0,5);
+  if(!withStreaks.length){html+='<div style="font-size:.8rem;color:var(--muted);padding:8px 0">Još nema podataka — kreni danas!</div>';}
+  else withStreaks.forEach(it=>{html+=`<div class="summary-row"><div style="flex:1;font-size:.8rem;color:var(--text)">${it.name}</div><div style="font-size:.8rem;color:var(--acc);font-weight:500">${it.streak}d 🔥</div></div>`;});
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+// ─── NOTE ───
+function loadNote(page){
+  const key=`note-${page}-${todayKey()}`;
+  const val=load(key,'');
+  const el=document.getElementById(`note-${page}`);
+  if(el){
+    el.value=val;
+    el.oninput=()=>{
+      save(key,el.value);
+      const s=document.getElementById(`note-saved-${page}`);
+      if(s){s.style.opacity='1';setTimeout(()=>s.style.opacity='0',1500)}
+    };
+  }
+}
+
+// ─── CONFESSION ───
+function loadConf(){
+  const conf=load('confession',{date:'',note:''});
+  const dateEl=document.getElementById('conf-date');
+  const noteEl=document.getElementById('conf-note');
+  if(dateEl)dateEl.value=conf.date||'';
+  if(noteEl)noteEl.value=conf.note||'';
+  updateConfSince(conf.date);
+}
+function saveConf(){
+  const date=document.getElementById('conf-date')?.value||'';
+  const note=document.getElementById('conf-note')?.value||'';
+  save('confession',{date,note});
+  updateConfSince(date);
+}
+function updateConfSince(dateStr){
+  const el=document.getElementById('conf-since');
+  if(!el)return;
+  if(!dateStr){el.textContent='';return}
+  const past=new Date(dateStr);const today=new Date();
+  const diff=Math.floor((today-past)/(1000*60*60*24));
+  el.textContent=diff===0?'Danas':`Prošlo: ${diff} dan${diff===1?'':'a'}`;
+}
+
+// ─── HOME ───
+function initHome(){
+  const d=new Date();
+  const el=document.getElementById('home-date');
+  if(el)el.textContent=formatDate(d);
+  const qEl=document.getElementById('home-quote');
+  if(qEl)qEl.textContent='« '+QUOTES[d.getDate()%QUOTES.length]+' »';
+  updateHomeStreaks();
+}
+function updateHomeStreaks(){
+  ['minimum','full'].forEach(page=>{
+    const items=document.querySelectorAll(`.check-item[data-page="${page}"]`);
+    let max=0;
+    items.forEach(item=>{const s=getStreak(page,item.dataset.id);if(s>max)max=s});
+    const id=page==='minimum'?'home-streak-min':'home-streak-full';
+    const el=document.getElementById(id);
+    if(el)el.textContent=max>0?`🔥 ${max}d`:'';
+  });
+}
+
+// ─── AUDIO ───
+function initAudio(){
+  const el=document.getElementById('audio-day');
+  if(el)el.textContent=formatDate(new Date());
+  renderDnevnaKrunica();
+  loadDnevni(false);
+}
+function renderDnevnaKrunica(){
+  const k=KRUNICA_MAP[new Date().getDay()];
+  const el=document.getElementById('audio-dnevna-krunica');
+  if(!el)return;
+  el.innerHTML=`<a class="yt-btn" href="${k.url}" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="white"/></svg></div><div class="yt-text"><div class="yt-name">Gospina krunica — ${k.label}</div><div class="yt-sub">${k.days}</div></div><span class="yt-badge today-badge">Danas</span></a>`;
+}
+let dnevniLoaded=false;
+async function loadDnevni(force){
+  if(dnevniLoaded&&!force)return;
+  const loading=document.getElementById('dnevni-loading');
+  const result=document.getElementById('dnevni-result');
+  if(!loading||!result)return;
+  loading.style.display='block';result.innerHTML='';
+  try{
+    const rss='https://www.youtube.com/feeds/videos.xml?channel_id=UCOhXHGT4pnPTpV0KJzQmzgw';
+    const res=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rss)}`);
+    const data=await res.json();
+    const xml=new DOMParser().parseFromString(data.contents,'text/xml');
+    const entries=xml.querySelectorAll('entry');
+    if(!entries.length)throw new Error('empty');
+    const e=entries[0];
+    const title=e.querySelector('title')?.textContent||'Najnoviji video';
+    const videoId=e.querySelector('videoId')?.textContent||'';
+    const published=e.querySelector('published')?.textContent?.slice(0,10)||'';
+    result.innerHTML=`<a class="yt-btn" href="https://www.youtube.com/watch?v=${videoId}" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="white"/></svg></div><div class="yt-text"><div class="yt-name">${title}</div><div class="yt-sub">${published} · @PodSmokvom</div></div><span class="yt-badge today-badge">Novo</span></a>`;
+    loading.style.display='none';dnevniLoaded=true;
+  }catch{
+    loading.style.display='none';
+    result.innerHTML=`<div class="dnevni-loading">Ne mogu učitati — <a href="https://www.youtube.com/@PodSmokvom/videos" target="_blank" style="color:var(--gold)">otvori kanal ↗</a></div>`;
+  }
+}
+
+// ─── PUSH ───
+const NOTIF_TIMES=[{id:'angelus-j',label:'Anđeo Gospodnji — jutro',hour:6,min:0},{id:'angelus-p',label:'Anđeo Gospodnji — podne',hour:12,min:0},{id:'milosrde',label:'Krunica milosrđa',hour:15,min:0},{id:'angelus-v',label:'Anđeo Gospodnji — večer',hour:18,min:0},{id:'ispit',label:'Ispit savjesti',hour:21,min:0}];
+function renderNotifBanner(page){
+  const wrap=document.getElementById(`${page==='minimum'?'min':'full'}-notif-wrap`);
+  if(!wrap||!('Notification' in window)||Notification.permission==='granted'){if(wrap)wrap.innerHTML='';return}
+  wrap.innerHTML=`<div class="notif-banner"><span>🔔 Primaj podsjetnike za molitve</span><button class="notif-btn" onclick="requestNotif(this)">Uključi</button></div>`;
+}
+async function requestNotif(btn){
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){btn.closest('.notif-banner').remove();scheduleNotifs();new Notification('Dnevna rutina 🕊️',{body:'Podsjetnici su uključeni.'})}
+}
+function scheduleNotifs(){
+  NOTIF_TIMES.forEach(n=>{
+    const now=new Date();const target=new Date();target.setHours(n.hour,n.min,0,0);
+    let delay=target-now;if(delay<0)delay+=86400000;
+    setTimeout(()=>{if(Notification.permission==='granted')new Notification('Dnevna rutina 🕊️',{body:n.label});setInterval(()=>{if(Notification.permission==='granted')new Notification('Dnevna rutina 🕊️',{body:n.label})},86400000)},delay);
+  });
+}
+
+// ─── EXPORT / IMPORT ───
+function exportData(){
+  const keys=['checks-minimum','checks-full','theme','confession','dnevnik'];
+  const extra=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith('note-')||k.startsWith('expand-')||k.startsWith('custom-')))extra.push(k)}
+  const all={};[...keys,...extra].forEach(k=>{const v=localStorage.getItem(k);if(v)all[k]=JSON.parse(v)});
+  const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`rutina-backup-${todayKey()}.json`;a.click();
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);Object.entries(data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));alert('Podaci su uvezeni! Stranica će se osvježiti.');location.reload()}catch{alert('Greška — provjeri fajl.')}};
+  reader.readAsText(file);
+}
+
+// ─── CUSTOM ITEMS ───
+function loadCustomItems(page){
+  const customs=load(`custom-${page}`,[]);
+  const container=document.getElementById(`custom-items-${page}`);
+  if(!container)return;
+  container.innerHTML='';
+  customs.forEach((item,i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='margin-bottom:4px';
+    const today=getTodayChecks(page);
+    const isDone=today[`custom-${i}`];
+    const streak=getStreak(page,`custom-${i}`);
+    div.innerHTML=`
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="check-item${isDone?' done':''}" data-page="${page}" data-id="custom-${i}" onclick="toggleItem(this)" style="flex:1;margin-bottom:0">
+          <div class="ci-check"><div class="ci-check-inner"></div></div>
+          <div class="ci-body"><div class="ci-name">${item}</div></div>
+          <div class="ci-streak"><div class="ci-streak-num" id="s-${page}-custom-${i}">${streak}</div><div class="ci-streak-label">dana</div></div>
+        </div>
+        <button onclick="removeCustomItem('${page}',${i})"
+          style="flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:var(--bg3);color:var(--muted);font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center"
+          title="Ukloni stavku">✕</button>
+      </div>`;
+    container.appendChild(div);
+  });
+  const addDiv=document.createElement('div');
+  addDiv.id=`add-custom-${page}`;
+  addDiv.innerHTML=customs.length<3?`
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <input id="custom-input-${page}" type="text" placeholder="Dodaj stavku (npr. Novena)..." maxlength="60"
+        style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:7px 10px;outline:none"
+        onkeydown="if(event.key==='Enter')addCustomItem('${page}')">
+      <button onclick="addCustomItem('${page}')" style="padding:7px 14px;border-radius:var(--rsm);border:1px solid var(--acc-br);background:var(--acc-bg);color:var(--acc);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500">+</button>
+    </div>`:'<div style="font-size:.7rem;color:var(--muted);padding:4px 0">Maksimum 3 vlastite stavke</div>';
+  container.appendChild(addDiv);
+}
+
+function addCustomItem(page){
+  const input=document.getElementById(`custom-input-${page}`);
+  if(!input||!input.value.trim())return;
+  const customs=load(`custom-${page}`,[]);
+  if(customs.length>=3)return;
+  customs.push(input.value.trim());
+  save(`custom-${page}`,customs);
+  input.value='';
+  loadCustomItems(page);
+}
+
+function removeCustomItem(page,idx){
+  if(!confirm('Ukloniti ovu stavku? Streak će se izgubiti.'))return;
+  const customs=load(`custom-${page}`,[]);
+  customs.splice(idx,1);
+  save(`custom-${page}`,customs);
+  const allChecks=load(`checks-${page}`,{});
+  Object.keys(allChecks).forEach(day=>{
+    for(let i=idx;i<3;i++){
+      allChecks[day][`custom-${i}`]=allChecks[day][`custom-${i+1}`];
+    }
+    delete allChecks[day]['custom-3'];
+  });
+  save(`checks-${page}`,allChecks);
+  loadCustomItems(page);
+}
+
+// ─── DUHOVNI DNEVNIK ───
+function initDnevnik(){
+  const d=new Date();
+  const el=document.getElementById('dnevnik-day');
+  if(el)el.textContent=formatDate(d);
+  const dateInput=document.getElementById('dnevnik-date-input');
+  if(dateInput&&!dateInput.value)dateInput.value=todayKey();
+  renderDnevnikList();
+}
+
+function saveDnevnikEntry(){
+  const date=document.getElementById('dnevnik-date-input')?.value||todayKey();
+  const verse=document.getElementById('dnevnik-verse-input')?.value.trim()||'';
+  const content=document.getElementById('dnevnik-content-input')?.value.trim()||'';
+  if(!content){alert('Upiši nešto u bilješku.');return;}
+  const entries=load('dnevnik',[]);
+  entries.unshift({id:Date.now(),date,verse,content});
+  save('dnevnik',entries);
+  document.getElementById('dnevnik-verse-input').value='';
+  document.getElementById('dnevnik-content-input').value='';
+  document.getElementById('dnevnik-date-input').value=todayKey();
+  renderDnevnikList();
+}
+
+function deleteDnevnikEntry(id){
+  if(!confirm('Obrisati ovu bilješku?'))return;
+  const entries=load('dnevnik',[]).filter(e=>e.id!==id);
+  save('dnevnik',entries);
+  renderDnevnikList();
+}
+
+function renderDnevnikList(){
+  const container=document.getElementById('dnevnik-list');
+  if(!container)return;
+  const entries=load('dnevnik',[]);
+  if(!entries.length){
+    container.innerHTML='<div style="font-size:.8rem;color:var(--muted);padding:8px 0;text-align:center">Još nema bilješki — dodaj prvu gore.</div>';
+    return;
+  }
+  container.innerHTML='';
+  entries.forEach(e=>{
+    const div=document.createElement('div');
+    div.style.cssText='margin-bottom:10px';
+    div.innerHTML=`
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;box-shadow:var(--shadow)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div>
+            <div style="font-size:.72rem;color:var(--gold);font-weight:500">${e.date}</div>
+            ${e.verse?`<div style="font-size:.78rem;color:var(--muted);font-style:italic;margin-top:1px">${e.verse}</div>`:''}
+          </div>
+          <button onclick="deleteDnevnikEntry(${e.id})"
+            style="background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;padding:0;flex-shrink:0;margin-left:8px"
+            title="Obriši">✕</button>
+        </div>
+        <div style="font-size:.82rem;color:var(--text);line-height:1.55;white-space:pre-wrap">${e.content}</div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+// ─── KAVA ───
+function openKava(){document.getElementById('kava-overlay').classList.add('show')}
+function closeKava(){document.getElementById('kava-overlay').classList.remove('show')}
+
+// ─── BOOT ───
+initTheme();
+applyLiturgical();
+applySaint();
+initHome();
+if(Notification.permission==='granted')scheduleNotifs();
+
+// ─── PWA ───
+let _deferredPrompt = null;
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r => console.log('SW ok', r.scope))
+      .catch(e => console.log('SW err', e));
+  });
+}
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredPrompt = e;
+  document.getElementById('pwa-install-btn')?.classList.add('visible');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('pwa-install-btn')?.classList.remove('visible');
+  _deferredPrompt = null;
+});
+async function installPWA() {
+  if (!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  const { outcome } = await _deferredPrompt.userChoice;
+  if (outcome === 'accepted') document.getElementById('pwa-install-btn')?.classList.remove('visible');
+  _deferredPrompt = null;
+}
+window.addEventListener('online',  () => document.getElementById('offline-bar')?.classList.remove('visible'));
+window.addEventListener('offline', () => document.getElementById('offline-bar')?.classList.add('visible'));
+
+
+// ─── GOOGLE DRIVE ───
+const DRIVE_CLIENT_ID = '669462828193-u4mvl5ada885a57mbj5f3qtph5lfool1.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const DRIVE_FILE_NAME = 'dnevna-rutina-backup.json';
+let _driveToken = null;
+
+function driveSetStatus(msg, isErr) {
+  const el = document.getElementById('drive-status');
+  if (el) { el.textContent = msg; el.style.color = isErr ? 'var(--acc)' : 'var(--muted)'; }
+}
+
+function driveSetLoading(btn, loading) {
+  const labels = { save: 'drive-save-label', load: 'drive-load-label' };
+  const el = document.getElementById(labels[btn]);
+  if (!el) return;
+  el.textContent = loading
+    ? (btn === 'save' ? '☁ Spremanje...' : '☁ Učitavanje...')
+    : (btn === 'save' ? '☁ Spremi na Drive' : '☁ Učitaj s Drivea');
+  const btnEl = document.getElementById(`drive-${btn}-btn`);
+  if (btnEl) btnEl.disabled = loading;
+}
+
+function driveSignIn(callback) {
+  if (_driveToken) { callback(_driveToken); return; }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: DRIVE_CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: (resp) => {
+      if (resp.error) { driveSetStatus('Prijava nije uspjela: ' + resp.error, true); return; }
+      _driveToken = resp.access_token;
+      callback(_driveToken);
+    }
+  });
+  client.requestAccessToken();
+}
+
+async function driveFindFile(token) {
+  const q = encodeURIComponent(`name='${DRIVE_FILE_NAME}' and trashed=false`);
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&fields=files(id,name,modifiedTime)`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  return data.files && data.files.length > 0 ? data.files[0] : null;
+}
+
+async function driveSave() {
+  driveSetLoading('save', true);
+  driveSetStatus('Prijava na Google...');
+  driveSignIn(async (token) => {
+    try {
+      // Collect all localStorage data
+      const keys = ['checks-minimum','checks-full','theme','confession','dnevnik'];
+      const extra = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('note-') || k.startsWith('expand-') || k.startsWith('custom-'))) extra.push(k);
+      }
+      const all = {};
+      [...keys, ...extra].forEach(k => { const v = localStorage.getItem(k); if (v) all[k] = JSON.parse(v); });
+      all._savedAt = new Date().toISOString();
+
+      const content = JSON.stringify(all, null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
+
+      driveSetStatus('Tražim postojeći backup...');
+      const existing = await driveFindFile(token);
+
+      let url, method;
+      if (existing) {
+        url = `https://www.googleapis.com/upload/drive/v3/files/${existing.id}?uploadType=media`;
+        method = 'PATCH';
+      } else {
+        // Create with metadata first
+        const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: DRIVE_FILE_NAME, mimeType: 'application/json' })
+        });
+        const metaData = await meta.json();
+        url = `https://www.googleapis.com/upload/drive/v3/files/${metaData.id}?uploadType=media`;
+        method = 'PATCH';
+      }
+
+      const uploadRes = await fetch(url, {
+        method,
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: content
+      });
+
+      if (!uploadRes.ok) throw new Error('Upload failed: ' + uploadRes.status);
+      const now = new Date().toLocaleTimeString('hr');
+      driveSetStatus(`✓ Spremljeno u ${now}`);
+    } catch (e) {
+      driveSetStatus('Greška: ' + e.message, true);
+      console.error('Drive save error:', e);
+    }
+    driveSetLoading('save', false);
+  });
+}
+
+async function driveLoad() {
+  driveSetLoading('load', true);
+  driveSetStatus('Prijava na Google...');
+  driveSignIn(async (token) => {
+    try {
+      driveSetStatus('Tražim backup na Driveu...');
+      const file = await driveFindFile(token);
+      if (!file) {
+        driveSetStatus('Nema backupa na Driveu — prvo spremi podatke.', true);
+        driveSetLoading('load', false);
+        return;
+      }
+
+      driveSetStatus('Preuzimam podatke...');
+      const res = await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Download failed: ' + res.status);
+      const data = await res.json();
+      const savedAt = data._savedAt ? new Date(data._savedAt).toLocaleString('hr') : 'nepoznato';
+
+      if (!confirm(`Pronašao sam backup iz: ${savedAt}
+
+Učitati i zamijeniti lokalne podatke?`)) {
+        driveSetStatus('Otkazano.');
+        driveSetLoading('load', false);
+        return;
+      }
+
+      delete data._savedAt;
+      Object.entries(data).forEach(([k, v]) => localStorage.setItem(k, JSON.stringify(v)));
+      driveSetStatus('✓ Podaci učitani! Osvježavam...');
+      setTimeout(() => location.reload(), 800);
+    } catch (e) {
+      driveSetStatus('Greška: ' + e.message, true);
+      console.error('Drive load error:', e);
+    }
+    driveSetLoading('load', false);
+  });
+}
+
+</script>
+</html>
