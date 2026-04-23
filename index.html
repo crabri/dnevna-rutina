@@ -9,7 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="Dnevna rutina">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>Dnevna rutina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -286,16 +287,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="home-btn-sub">Krunice, litanije i ostalo</div>
     </button>
   </div>
-  <div style="padding:0 1.25rem .4rem;display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+  <div style="padding:0 1.25rem .2rem;display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
     <a class="home-btn" href="https://hilp.hr/liturgija-dana/" target="_blank" style="display:block;text-decoration:none;background:var(--bg3);border-color:var(--border2)">
       <span class="home-btn-icon" style="font-size:1.3rem">📖</span>
       <div class="home-btn-title">Čitanje dana</div>
       <div class="home-btn-sub">Liturgijska čitanja · hilp.hr ↗</div>
     </a>
-    <button class="home-btn" onclick="goTo('dnevnik')" style="background:var(--bg3);border-color:var(--border2)">
-      <span class="home-btn-icon" style="font-size:1.3rem">✍️</span>
-      <div class="home-btn-title">Duhovni dnevnik</div>
-      <div class="home-btn-sub">Bilješke, misli, uvidi</div>
+    <a class="home-btn" href="https://dt.com.hr/blago/" target="_blank" style="display:block;text-decoration:none;background:var(--bg3);border-color:var(--border2)">
+      <span class="home-btn-icon" style="font-size:1.3rem">🕯️</span>
+      <div class="home-btn-title">Časoslov</div>
+      <div class="home-btn-sub">Liturgija časova · dt.com.hr ↗</div>
+    </a>
+  </div>
+  <div style="padding:0 1.25rem .4rem;margin-top:.65rem">
+    <button class="home-btn" onclick="goTo('dnevnik')" style="width:100%;background:var(--bg3);border-color:var(--border2)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:1.3rem">✍️</span>
+        <div>
+          <div class="home-btn-title">Duhovni dnevnik</div>
+          <div class="home-btn-sub">Bilješke, misli, uvidi</div>
+        </div>
+      </div>
     </button>
   </div>
   <div class="home-quote" id="home-quote"></div>
@@ -712,6 +724,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
     <button class="tool-btn" onclick="goTo('summary')">📊 Tjedni sažetak</button>
   </div>
+  <div class="tools-wrap" style="margin-top:0">
+    <button class="tool-btn" id="drive-save-btn" onclick="driveSave()" style="border-color:var(--gold-br);color:var(--gold)"><span id="drive-save-label">☁ Spremi na Drive</span></button>
+    <button class="tool-btn" id="drive-load-btn" onclick="driveLoad()" style="border-color:var(--gold-br);color:var(--gold)"><span id="drive-load-label">☁ Učitaj s Drivea</span></button>
+  </div>
+  <div id="drive-status" style="margin:0 1.25rem .4rem;font-size:.72rem;color:var(--muted);min-height:1rem"></div>
   <div class="bottom-pad"></div>
 </div>
 </div>
@@ -738,28 +755,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="page-day" id="audio-day"></div>
   </div>
   <div class="audio-section">
-    <div class="audio-group-label">Dnevno razmatranje — @PodSmokvom</div>
-    <div class="dnevni-loading" id="dnevni-loading">Učitavam najnoviji video...</div>
-    <div class="yt-grid" id="dnevni-result"></div>
-    <button class="refresh-btn" onclick="loadDnevni(true)">↺ Osvježi</button>
     <div class="audio-group-label">Dnevna krunica</div>
     <div class="yt-grid" id="audio-dnevna-krunica"></div>
     <div class="audio-group-label">Jutro</div>
     <div class="yt-grid">
       <a class="yt-btn" href="https://www.youtube.com/watch?v=NHrzp-jvGUo" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Jutarnja molitva + predanje Bogu</div></div></a>
-      <a class="yt-btn" href="https://www.youtube.com/watch?v=gFajKJYwaSQ" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Jutarnji molitveni čas</div></div></a>
       <a class="yt-btn" href="https://www.youtube.com/@PodSmokvom" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Čitanje dana s razmatranjem</div><div class="yt-sub">@PodSmokvom</div></div></a>
     </div>
     <div class="audio-group-label">Tijekom dana</div>
     <div class="yt-grid">
-      <a class="yt-btn" href="https://www.youtube.com/watch?v=nHVPYgQkHVc" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Angelus — jutro / podne / večer</div></div></a>
+      <a class="yt-btn" id="audio-angelus-btn" href="https://www.youtube.com/watch?v=nHVPYgQkHVc" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name" id="audio-angelus-name">Anđeo Gospodnji</div><div class="yt-sub" id="audio-angelus-sub">jutro / podne / večer</div></div></a>
       <a class="yt-btn" href="https://www.youtube.com/watch?v=iGKp0HdSykw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Krunica Božjeg milosrđa (15:00)</div></div></a>
       <a class="yt-btn" href="https://www.youtube.com/watch?v=08FAIhGjOgw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Dnevna sv. Misa</div></div></a>
     </div>
     <div class="audio-group-label">Večer</div>
     <div class="yt-grid">
       <a class="yt-btn" href="https://www.youtube.com/watch?v=Up3znCJEFAQ" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Večernja molitva</div></div></a>
-      <a class="yt-btn" href="https://www.youtube.com/watch?v=CkzinOOkSjw" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Ispit savjesti / egzamen</div></div></a>
+      <a class="yt-btn" id="ispit-btn" href="#" onclick="openRandomFromPlaylist('PLgrvM2s1LQ_f-oeYvQLACUzDCwrCDbYI9', this); return false;"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name" id="ispit-name">Ispit savjesti / egzamen</div><div class="yt-sub">random video s playliste ↻</div></div></a>
       <a class="yt-btn" href="https://www.youtube.com/watch?v=nu3BUKpJHFA&list=PLi3iUNXPgA_gNacvdlme4JZqirKbMQ2hn" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Čitanje psalma</div><div class="yt-sub">Playlist</div></div></a>
       <a class="yt-btn" href="https://www.youtube.com/watch?v=54Lxp_Wvb14&list=PLPg96Gwgu13X4dpP0q9DVPHVyqApMOOtl" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Euharistijsko klanjanje</div><div class="yt-sub">Playlist</div></div></a>
     </div>
@@ -817,6 +829,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <a class="yt-btn" href="https://www.youtube.com/watch?v=Isk-U74KFSg" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Kraljice neba, raduj se</div></div></a>
       <a class="yt-btn" href="https://www.youtube.com/watch?v=GV1r39Erjn8" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Molitva za obitelj</div></div></a>
       <a class="yt-btn" href="https://www.youtube.com/watch?v=S_faPOJ06JI" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Molitva za svećenike</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=Us3loHrpkGM" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Posveta Gospi Karmelskoj</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=iWeaGad3hZg" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Posvetna molitva Bezgrješnom Srcu Marijinu</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=Ay7YK0fUqAc" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Pod obranu se Tvoju utječemo</div></div></a>
+    </div>
+  </div>
+  <div class="audio-section">
+    <div class="audio-group-label">Psalmi</div>
+    <div class="yt-grid">
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=KVS6NGVueYI&list=PLx4fRpi9cWDZTG_IVRe2K95T07LzZwYDp" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Psalmi (1–30)</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=S2p4w0HX6lM&list=PLx4fRpi9cWDaKfd1BsPuw3BKEL9XdwiDq" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Psalmi (31–60)</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=9plj7UxEq9w&list=PLx4fRpi9cWDYuA-VECudaN7UC9KlQTKk2" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Psalmi (61–90)</div></div></a>
+      <a class="yt-btn" href="https://www.youtube.com/watch?v=TlKpi1XaOIY&list=PLx4fRpi9cWDZUoijdpUGyi9Zvl8I839yl" target="_blank"><div class="yt-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div class="yt-text"><div class="yt-name">Psalmi (91–120)</div></div></a>
     </div>
   </div>
   <div class="bottom-pad"></div>
@@ -1405,6 +1429,7 @@ function initAudio(){
   if(el)el.textContent=formatDate(new Date());
   renderDnevnaKrunica();
   loadDnevni(false);
+  updateAudioAngelus();
 }
 function renderDnevnaKrunica(){
   const k=KRUNICA_MAP[new Date().getDay()];
@@ -1599,6 +1624,48 @@ function renderDnevnikList(){
 // ─── KAVA ───
 function openKava(){document.getElementById('kava-overlay').classList.add('show')}
 function closeKava(){document.getElementById('kava-overlay').classList.remove('show')}
+
+
+// ─── RANDOM FROM PLAYLIST ───
+async function openRandomFromPlaylist(playlistId, btnEl) {
+  const nameEl = btnEl ? btnEl.querySelector('[id$="-name"], .yt-name') : null;
+  const origText = nameEl ? nameEl.textContent : '';
+  if (nameEl) nameEl.textContent = 'Učitavam...';
+  try {
+    const rss = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistId}`;
+    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rss)}`);
+    const data = await res.json();
+    const xml = new DOMParser().parseFromString(data.contents, 'text/xml');
+    const entries = Array.from(xml.querySelectorAll('entry'));
+    if (!entries.length) throw new Error('prazna lista');
+    const pick = entries[Math.floor(Math.random() * entries.length)];
+    const videoId = pick.querySelector('videoId')?.textContent || '';
+    const title = pick.querySelector('title')?.textContent || 'Video';
+    if (nameEl) nameEl.textContent = title;
+    setTimeout(() => { if (nameEl) nameEl.textContent = origText; }, 4000);
+    window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+  } catch(e) {
+    if (nameEl) nameEl.textContent = origText;
+    alert('Nije moguće učitati playlistu. Provjeri internet vezu.');
+  }
+}
+
+// ─── AUDIO ANGELUS — liturgical update ───
+function updateAudioAngelus() {
+  const btn = document.getElementById('audio-angelus-btn');
+  const nameEl = document.getElementById('audio-angelus-name');
+  const subEl = document.getElementById('audio-angelus-sub');
+  if (!btn || !litData) return;
+  if (litData.easterTime) {
+    btn.href = 'https://www.youtube.com/watch?v=Isk-U74KFSg';
+    if (nameEl) nameEl.textContent = 'Kraljice neba, raduj se';
+    if (subEl) subEl.textContent = 'Uskrsno vrijeme · 3× dnevno';
+  } else {
+    btn.href = 'https://www.youtube.com/watch?v=nHVPYgQkHVc';
+    if (nameEl) nameEl.textContent = 'Anđeo Gospodnji';
+    if (subEl) subEl.textContent = 'jutro / podne / večer';
+  }
+}
 
 // ─── BOOT ───
 initTheme();
